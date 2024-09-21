@@ -1,9 +1,9 @@
 /*
 ============================================================================
-Name : 28.c
+Name : 29.c
 Author : Archis Kulkarni
-Description : Write a program to change the exiting message queue permission. (use msqid_ds structure) 
-Date: 19-09-2024
+Description : Write a program to remove the message queue.
+Date: 20-09-2024
 ============================================================================
 */
 #include <stdio.h>
@@ -31,47 +31,37 @@ int main() {
     }
     printf("The generated message queue id is: %d\n",id);
     
-    // we get the info of msgs using msgctl into msqui_ds struct
-    struct msqid_ds buffer;
-    int status=msgctl(id, IPC_STAT, &buffer);
+    // we remove message queue using msgctl 
+    int status=msgctl(id, IPC_RMID, NULL);
     if (status==-1)
     {
-        perror("getting info on messages failed");
-        exit(EXIT_FAILURE);
-    }
-
-    // set the permissions
-    buffer.msg_perm.mode = 0665;
-    int status1=msgctl(id, IPC_SET, &buffer);
-    if (status1==-1)
-    {
-        perror("setting info on messages failed");
+        perror("removing message queue failed");
         exit(EXIT_FAILURE);
     }
 
     //print the required values
-    printf("Updated permissions: %o\n",buffer.msg_perm.mode); 
+    printf("Removed message queue id: %d\n",id); 
     
 }
 
 /*
- ./a.out
+./a.out
 The generated key is: 1092630638
 The generated message queue id is: 0
-Updated permissions: 665
+Removed message queue id: 0
 
 --Before--
 ipcs -q
 
 ------ Message Queues --------
 key        msqid      owner      perms      used-bytes   messages
-0x4120386e 0          linuxboi   666        0            0
+0x4120386e 0          linuxboi   665        0            0
 
 
 --After--
- ipcs -q
+  ipcs -q
 
 ------ Message Queues --------
 key        msqid      owner      perms      used-bytes   messages
-0x4120386e 0          linuxboi   665        0            0
+
 */
